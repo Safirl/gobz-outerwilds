@@ -1,0 +1,122 @@
+import * as THREE from "three/webgpu";
+import Experience from "../experience/Experience";
+import type Debug from "../utils/Debug";
+import EnvironmentMap from "./EnvironmentMap";
+import type { LifeTimeObject } from "../types/types";
+import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
+
+export default class Environment implements LifeTimeObject {
+	declare shadowHelper: THREE.CameraHelper;
+	declare experience: Experience;
+	declare scene: Experience["scene"];
+	declare sunLight: THREE.DirectionalLight;
+	declare resources: Experience["resources"];
+	declare environmentMap: EnvironmentMap;
+	declare debug: Debug;
+	declare debugFolder: ParametersGroup;
+	declare protected sunlightDebugFolder: ParametersGroup;
+
+	constructor(
+		lightingEnvironmentMap?: THREE.CubeTexture,
+		useAsBackground: boolean = false,
+		backgroundEnvironmentMap?: THREE.CubeTexture
+	) {
+		if (!Experience.instance)
+			throw new Error(
+				"Environment initialization failed: Experience.instance is not available. Make sure Experience is initialized before creating the Environment."
+			);
+
+		this.experience = Experience.instance;
+		this.scene = this.experience.scene;
+		this.resources = this.experience.resources;
+
+		this.debug = this.experience.debug;
+
+		if (this.debug.active) {
+			this.debugFolder = this.debug.inspector.createParameters("🗺️ environment");
+		}
+
+		this.setSunlight();
+		if (lightingEnvironmentMap)
+			this.setEnvironmentMap(
+				lightingEnvironmentMap,
+				useAsBackground,
+				backgroundEnvironmentMap
+			);
+
+		this.setDebugObject();
+	}
+
+	init = () => {};
+	destroy = () => {};
+
+	update() {
+		this.shadowHelper.update();
+	}
+
+	setSunlight() {
+		this.sunLight = new THREE.DirectionalLight("#d6ac85", 1.);
+		this.sunLight.castShadow = true;
+		this.sunLight.shadow.camera.far = 35;
+		this.sunLight.shadow.mapSize.set(1024, 1024);
+    this.sunLight.shadow.normalBias = 0.05;
+    this.sunLight.shadow.camera.left = -20.
+    this.sunLight.shadow.camera.right = 20.
+    this.sunLight.shadow.camera.top = 20.
+    this.sunLight.shadow.camera.bottom = -20.
+    const target = new THREE.Mesh()
+    this.scene.add(target)
+		target.position.set(0,0,0)
+    this.sunLight.target = target
+    this.sunLight.position.set(- 17, 3, -11)
+
+		this.scene.add(this.sunLight);
+	}
+
+	setEnvironmentMap(
+		lightingEnvironmentMap: THREE.CubeTexture,
+		useAsBackground: boolean = false,
+		backgroundEnvironmentMap?: THREE.CubeTexture
+	) {
+		this.environmentMap = new EnvironmentMap(
+			0.5,
+			lightingEnvironmentMap,
+			this.scene,
+			useAsBackground
+		);
+		if (useAsBackground && backgroundEnvironmentMap) {
+			this.environmentMap.setBackgroundEnvironment(backgroundEnvironmentMap);
+		}
+		this.environmentMap.texture.colorSpace = THREE.SRGBColorSpace;
+
+		//materials are not all created so this needs to be updated manually
+		setTimeout(() => {
+			this.environmentMap.updateMaterials();
+		}, 200);
+	}
+
+	setEnvironmentMapIntensity(intensity: number) {
+		this.environmentMap.intensity = intensity;
+		this.environmentMap.updateMaterials();
+	}
+
+	setDebugObject() {
+		if (this.debug.active) {
+			this.debugFolder
+				.add(this.environmentMap, "intensity", 0, 4, .001)
+				.name("envMapIntensity")
+				.onChange(this.environmentMap.updateMaterials);
+
+      this.sunlightDebugFolder = this.debugFolder.addFolder("☀️ sunlight");
+      this.sunlightDebugFolder.add(this.sunLight, "intensity", 0., 20, .1).name("sun intensity")
+      this.sunlightDebugFolder.addColor(this.sunLight, "color").name("sun color")
+      this.sunlightDebugFolder.add(this.sunLight.position, "x", -20., 20, .1).name("sun pos x")
+      this.sunlightDebugFolder.add(this.sunLight.position, "y", -20., 20, .1).name("sun pos y")
+      this.sunlightDebugFolder.add(this.sunLight.position, "z", -20., 20, .1).name("sun pos z")
+
+			this.shadowHelper = new THREE.CameraHelper(this.sunLight.shadow.camera);
+      // this.shadowHelper.layers.set(2);
+			this.scene.add(this.shadowHelper);
+		}
+	}
+}
