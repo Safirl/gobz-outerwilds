@@ -92,8 +92,8 @@ export default class Campfire implements LifeTimeObject{
     this.light = new THREE.PointLight()
     this.light.color = this.fireCenterColor.value
     this.light.intensity = 8.
-    this.light.distance = 0.
-    this.light.decay = 0.5
+    this.light.distance = 25
+    this.light.decay = 0.2
     this.light.castShadow = true
     this.light.position.y = 1.
     this.light.position.x = .5
@@ -109,6 +109,7 @@ export default class Campfire implements LifeTimeObject{
   createMaterial = () => {
     this.fireMaterial = new THREE.MeshStandardNodeMaterial({
       transparent: true,
+      depthWrite: false
     })
 
     const coords = uv().sub(.5).mul(2)

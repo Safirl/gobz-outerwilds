@@ -4,12 +4,13 @@ import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "three/webgpu"
 import Tree from "./Tree";
 import type { Textures } from "@plugins/three-base-experience/types/types";
-import { blendColor, float, Fn, mix, mx_fractal_noise_float, normalMap, remap, smoothstep, uniform, uv } from "three/tsl";
+import { float, Fn, mix, mx_fractal_noise_float, normalMap, remap, smoothstep, uniform, uv } from "three/tsl";
 import { positionLocal } from "three/src/nodes/TSL.js";
 
 export default class Moon extends StaticObject{
   declare private debug: Debug
   declare private debugFolder: ParametersGroup
+  declare material: THREE.MeshStandardNodeMaterial;
 
   public treeTheta = { value: -3.14159265358979 }
   public treePhi = {value: 1.42}
@@ -17,9 +18,9 @@ export default class Moon extends StaticObject{
 
   //uniforms
   public maskScale = uniform(.6)
-  public smoothBlend = uniform(.03)
+  public smoothBlend = uniform(0.15)
   public offset = uniform(7.76)
-  public spread = uniform(.4)
+  public spread = uniform(.5)
 
   constructor() {
     super()
@@ -38,7 +39,7 @@ export default class Moon extends StaticObject{
     new Tree(1.81,-0.351,  this.radius, this.mesh.position, "tree 3", this.experience.resources.items.treeModel2 as GLTF, true, true)
     // new Tree(2.01,0.58,  this.radius, this.mesh.position, "tree 4", this.experience.resources.items.treeModel2 as GLTF, true, true)
     new Tree(1.914,1.129,  this.radius, this.mesh.position, "tree 5", this.experience.resources.items.treeModel2 as GLTF, true, true)
-    new Tree(1.71,1.66,  this.radius, this.mesh.position, "tree 6", this.experience.resources.items.treeModel2 as GLTF, true, true)
+    new Tree(1.03,-3.00,  this.radius, this.mesh.position, "tree 6", this.experience.resources.items.treeModel2 as GLTF, true, true)
   }
 
   setGeometry(): void {
@@ -112,20 +113,21 @@ export default class Moon extends StaticObject{
       // aoMap: this.textures[0].aoMap
       transparent: true
     })
+    const repeatScale = 80.
     //grass texture
-    const grassMap = new THREE.TextureNode(this.textures[1].color, uv().mul(30.).fract())
-    const grassNormal = new THREE.TextureNode(this.textures[1].normal, uv().mul(30.).fract())
-    const grassRoughness = new THREE.TextureNode(this.textures[1].roughness, uv().mul(30.).fract())
-    const grassMetalness = new THREE.TextureNode(this.textures[1].metalness, uv().mul(30.).fract())
-    const grassAo = new THREE.TextureNode(this.textures[1].aoMap, uv().mul(30.).fract())
+    const grassMap = new THREE.TextureNode(this.textures[1].color, uv().mul(repeatScale).fract())
+    const grassNormal = new THREE.TextureNode(this.textures[1].normal, uv().mul(repeatScale).fract())
+    const grassRoughness = new THREE.TextureNode(this.textures[1].roughness, uv().mul(repeatScale).fract())
+    const grassMetalness = new THREE.TextureNode(this.textures[1].metalness, uv().mul(repeatScale).fract())
+    const grassAo = new THREE.TextureNode(this.textures[1].aoMap, uv().mul(repeatScale).fract())
 
     //dirt
-    const dirtMap = new THREE.TextureNode(this.textures[0].color, uv().mul(30.).fract())
-    const dirtNormal = new THREE.TextureNode(this.textures[0].normal, uv().mul(30.).fract())
-    const dirtRoughness = new THREE.TextureNode(this.textures[0].roughness, uv().mul(30.).fract())
-    // const dirtMetalness = new THREE.TextureNode(this.textures[0].metalness, uv().mul(30.).fract())
+    const dirtMap = new THREE.TextureNode(this.textures[0].color, uv().mul(repeatScale).fract())
+    const dirtNormal = new THREE.TextureNode(this.textures[0].normal, uv().mul(repeatScale).fract())
+    const dirtRoughness = new THREE.TextureNode(this.textures[0].roughness, uv().mul(repeatScale).fract())
+    // const dirtMetalness = new THREE.TextureNode(this.textures[0].metalness, uv().mul(repeatScale).fract())
     const dirtMetalness = float(0.)
-    const dirtAo = new THREE.TextureNode(this.textures[0].aoMap, uv().mul(30.).fract())
+    const dirtAo = new THREE.TextureNode(this.textures[0].aoMap, uv().mul(repeatScale).fract())
 
     //blendFactor
     const coords = positionLocal.remap(float(-1), float(1), float(0), float(1)).mul(float(this.maskScale))
@@ -142,13 +144,7 @@ export default class Moon extends StaticObject{
   }
 
   setMesh(): void {
-    // super.setMesh()
-    if (!this.geometry || !this.material)
-      console.warn(
-        "Can't instantiate mesh: Geometry or material is not valid for",
-        this,
-      );
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    super.setMesh()
     this.mesh.rotateX(Math.PI/4)
     this.mesh.position.y = -this.radius
     this.mesh.receiveShadow = true;
@@ -159,6 +155,7 @@ export default class Moon extends StaticObject{
     if (!this.experience.debug.active) return;
     this.debug = this.experience.debug
     this.debugFolder = this.experience.debug.inspector.createParameters("🌍 Planet")
+    this.debugFolder.close()
     this.debugFolder.add(this.maskScale, "value", 0., 5., .01).name("mask scale")
     this.debugFolder.add(this.smoothBlend, "value", 0., .5, .01).name("smooth blend")
     this.debugFolder.add(this.offset, "value", 0., 10., .01).name("offset")

@@ -32,7 +32,7 @@ export default class ExpWorld extends World {
     this.earth = new Earth();
     this.sun = new Sun();
 
-    this.scene.add(this.earth.mesh, this.sun.mesh)
+    this.scene.add(this.sun.mesh)
     if (this.experience.debug.active) {
       this.compass = new Compass(this.experience, this.scene)
       this.compass.init()

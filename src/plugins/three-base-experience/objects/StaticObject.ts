@@ -12,8 +12,8 @@ export default abstract class StaticObject implements LifeTimeObject {
   declare resources: Resources;
   declare geometry: THREE.BufferGeometry;
   declare textures: Textures[];
-  declare material: THREE.MeshStandardNodeMaterial;
-  declare mesh: THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardNodeMaterial>;
+  declare material: THREE.NodeMaterial;
+  declare mesh: THREE.Mesh;
   declare receiveShadows: boolean;
   declare castShadow: boolean;
   private id: string = crypto.randomUUID();
