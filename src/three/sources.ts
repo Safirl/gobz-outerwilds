@@ -102,6 +102,11 @@ const sources: Source[] = [
     type: "gltfModel",
     path: "models/earth/scene.gltf",
   },
+  {
+    name: "characterModel",
+    type: "gltfModel",
+    path: "models/character/character.gltf",
+  },
 
   //stylized ground
   {

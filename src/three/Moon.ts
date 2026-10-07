@@ -11,6 +11,7 @@ export default class Moon extends StaticObject{
   declare private debug: Debug
   declare private debugFolder: ParametersGroup
   declare material: THREE.MeshStandardNodeMaterial;
+  declare character: THREE.Object3D
 
   public treeTheta = { value: -3.14159265358979 }
   public treePhi = {value: 1.42}
@@ -30,8 +31,16 @@ export default class Moon extends StaticObject{
   init = () => {
     super.init()
     this.createTrees()
+    this.createCharacter()
     this.setDebugObject()
   };
+
+  createCharacter = () => {
+    const character = new Actor("character", this.experience.resources.items.characterModel as GLTF, true, false)
+    this.character = character.model
+    character.model.position.set(-1.16, -0.09, -3.45)
+    character.model.rotation.set(0, -1.51, 0)
+  }
 
   createTrees = () => {
     new Tree(1.718,1.621,  this.radius, this.mesh.position, "tree 1", this.experience.resources.items.treeModel2 as GLTF, true, true)
@@ -155,11 +164,21 @@ export default class Moon extends StaticObject{
     if (!this.experience.debug.active) return;
     this.debug = this.experience.debug
     this.debugFolder = this.experience.debug.inspector.createParameters("🌍 Planet")
-    this.debugFolder.close()
+    // this.debugFolder.close()
     this.debugFolder.add(this.maskScale, "value", 0., 5., .01).name("mask scale")
     this.debugFolder.add(this.smoothBlend, "value", 0., .5, .01).name("smooth blend")
     this.debugFolder.add(this.offset, "value", 0., 10., .01).name("offset")
     this.debugFolder.add(this.spread, "value", 0., 1., .01).name("spread")
+
+    const characterDebugFolder = this.debugFolder.addFolder("character")
+    characterDebugFolder.add(this.character.position, "x", -10., 10., .01).name("posX")
+    characterDebugFolder.add(this.character.position, "y", -10., 10., .01).name("posY")
+    characterDebugFolder.add(this.character.position, "z", -10., 10., .01).name("posZ")
+
+    characterDebugFolder.add(this.character.rotation, "x", -10., 10., .01).name("rotX")
+    characterDebugFolder.add(this.character.rotation, "y", -10., 10., .01).name("rotY")
+    characterDebugFolder.add(this.character.rotation, "z", -10., 10., .01).name("rotZ")
+
   }
 
   update = () => {};
