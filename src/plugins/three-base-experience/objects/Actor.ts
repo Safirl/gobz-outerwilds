@@ -21,6 +21,7 @@ export default class Actor implements LifeTimeObject {
   declare colliderModel: THREE.Object3D;
   declare animation: Animation;
   declare time: Time;
+  declare doubleSided: boolean
   declare debug: Debug;
   declare debugFolder: ParametersGroup;
   declare name: string;
@@ -31,6 +32,7 @@ export default class Actor implements LifeTimeObject {
     resource: GLTF,
     autoAddToScene: boolean = true,
     makeUnique: boolean = false,
+    doubleSided = false,
     collisionResource?: GLTF,
   ) {
     if (!Experience.instance)
@@ -44,6 +46,7 @@ export default class Actor implements LifeTimeObject {
       this.debugFolder = this.debug.inspector.createParameters(name);
     }
     this.name = name;
+    this.doubleSided = doubleSided
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
     this.time = this.experience.time;
@@ -102,6 +105,9 @@ export default class Actor implements LifeTimeObject {
         material.transparent = false;
         material.alphaTest = 0.5;
         material.depthWrite = true;
+      }
+      if (!this.doubleSided && material.side == THREE.DoubleSide) {
+        material.side = THREE.FrontSide
       }
     });
   }

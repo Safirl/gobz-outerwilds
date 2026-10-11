@@ -1,0 +1,11 @@
+Model Information:
+* title:	Marshmallow Stick
+* source:	https://sketchfab.com/3d-models/marshmallow-stick-5b52a3e2c43044619f221777b9342ea2
+* author:	Maxitaxx (https://sketchfab.com/maxitaxx)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Marshmallow Stick" (https://sketchfab.com/3d-models/marshmallow-stick-5b52a3e2c43044619f221777b9342ea2) by Maxitaxx (https://sketchfab.com/maxitaxx) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

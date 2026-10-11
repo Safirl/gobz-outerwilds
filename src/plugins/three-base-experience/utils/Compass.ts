@@ -89,7 +89,6 @@ export default class Compass implements LifeTimeObject {
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
     this.raycaster.setFromCamera(pointer, this.experience.camera.instance);
     const intersects = this.raycaster.intersectObjects(this.scene.children, false);
-    console.log(intersects)
 
     if (intersects.length > 0) {
       if (intersects[0].object == this.controls.getHelper()) {

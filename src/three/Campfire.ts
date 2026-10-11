@@ -1,11 +1,11 @@
 import { Actor, Debug, Experience, type LifeTimeObject } from "@plugins/three-base-experience";
 import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
-import { mx_perlin_noise_float } from "three/src/nodes/materialx/MaterialXNoise.js";
-import { float, mx_noise_float, uniform, uv, vec3, mul, mx_fractal_noise_float, time, negate, vec2, texture, smoothstep, remap, min, max, positionLocal, vec4, saturate, mx_fractal_noise_vec2, mix, billboarding, range, rotateUV, color } from "three/tsl";
+import { mx_noise_float, uniform, uv, mx_fractal_noise_float, time, vec2, texture, remap, min, positionLocal, vec4, saturate, mix, billboarding, range, rotateUV, color, Fn } from "three/tsl";
 //@ts-ignore
 import { perlinNoise } from "tsl-textures";
 import * as THREE from "three/webgpu"
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { convertStandardMaterial } from "@plugins/three-base-experience";
 
 export default class Campfire implements LifeTimeObject{
   declare public mesh: THREE.Mesh
@@ -43,10 +43,10 @@ export default class Campfire implements LifeTimeObject{
     this.experience = Experience.instance
 
     this.mesh = new THREE.Mesh(this.createGeometry(), this.createMaterial());
-    this.mesh.castShadow = true;
+    // this.mesh.castShadow = true;
+    this.mesh.renderOrder = 10
     this.mesh.position.y = .25
-    this.mesh.position.x = -.2
-    this.mesh.position.x = -.2
+    this.mesh.position.x = -.13
     this.experience.scene.add(this.mesh)
     this.createSmoke()
     this.createPointLight()
@@ -84,7 +84,8 @@ export default class Campfire implements LifeTimeObject{
     const smokeInstancedSprite = new THREE.Mesh( new THREE.PlaneGeometry( 1., 1 ), smokeNodeMaterial );
 		smokeInstancedSprite.scale.setScalar( 5 );
     smokeInstancedSprite.count = 200;
-		smokeInstancedSprite.position.y = .3
+    smokeInstancedSprite.position.y = .3
+		smokeInstancedSprite.renderOrder = 11
 		this.experience.scene.add( smokeInstancedSprite );
   }
 
@@ -102,14 +103,15 @@ export default class Campfire implements LifeTimeObject{
   }
 
   createGeometry = () => {
-    return new THREE.PlaneGeometry(1.5, 2.)
+    return new THREE.PlaneGeometry(1.3, 2.5)
     // return new THREE.BoxGeometry(.5, .5, .5)
   }
 
   createMaterial = () => {
     this.fireMaterial = new THREE.MeshStandardNodeMaterial({
       transparent: true,
-      depthWrite: false
+      depthWrite: false,
+      // depthTest: false
     })
 
     const coords = uv().sub(.5).mul(2)
@@ -134,7 +136,7 @@ export default class Campfire implements LifeTimeObject{
 
     this.fireMaterial.colorNode = vec4(color, alpha)
     this.fireMaterial.vertexNode = billboarding()
-    this.fireMaterial.depthWrite = true;
+    // this.fireMaterial.depthWrite = true;
 
     return this.fireMaterial;
   }
@@ -145,7 +147,25 @@ export default class Campfire implements LifeTimeObject{
       true,
       false,
     );
+    this.campfire.model.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        const childMaterial = child.material as THREE.MeshStandardMaterial
+        const meshMaterial = convertStandardMaterial(childMaterial);
+
+        const n = mx_noise_float(positionLocal.mul(10).add(time)).mul(0.5).add(0.5)
+        const shadownColor = color("#fff")
+        meshMaterial.castShadowNode = vec4(shadownColor, .0)
+        child.material = meshMaterial;
+      };
+    })
   };
+
+  castedShadows = Fn(() => {
+    const coords = positionLocal
+    const noise = mx_noise_float(coords)
+    return vec4(noise)
+  })
+
   update = () => {};
   destroy = () => { };
   setDebugObject = () => {

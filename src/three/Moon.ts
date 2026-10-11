@@ -33,11 +33,13 @@ export default class Moon extends StaticObject{
     this.createTrees()
     this.createCharacter()
     this.setDebugObject()
+
   };
 
   createCharacter = () => {
     const character = new Actor("character", this.experience.resources.items.characterModel as GLTF, true, false)
     this.character = character.model
+    this.character.receiveShadow = false
     character.model.position.set(-1.16, -0.09, -3.45)
     character.model.rotation.set(0, -1.51, 0)
   }

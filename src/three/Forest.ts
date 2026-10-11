@@ -33,7 +33,6 @@ export default class Forest implements LifeTimeObject {
       }
     })
     const trunk = tree.model.children[0].children[0] as THREE.Mesh
-    console.log(trunk)
     // const mesh2 = tree.model.children[0].children[1]
 
     const positions = instancedArray(100, 'vec3')
@@ -53,7 +52,6 @@ export default class Forest implements LifeTimeObject {
 
     const oldMat = trunk.material as THREE.MeshStandardMaterial
     const material = new THREE.MeshStandardNodeMaterial().copy(oldMat);
-    console.log(trunk.geometry)
 
     material.positionNode = this.rotateVectorByQuaternion(positionLocal, instanceRotation).add(instancePosition);
     const trunkInstance = new THREE.InstancedMesh(trunk.geometry, material, this.count)

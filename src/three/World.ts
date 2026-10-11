@@ -5,6 +5,7 @@ import Moon from "./Moon";
 import Sun from "./Sun";
 import Compass from "@plugins/three-base-experience/utils/Compass";
 import Earth from "./Earth";
+import Stick from "./Stick";
 
 export default class ExpWorld extends World {
   declare experience: Experience;
@@ -16,6 +17,7 @@ export default class ExpWorld extends World {
   declare sun: Sun
   declare earth: Earth
   declare compass: Compass
+  declare stick: Stick
 
   init() {
     super.init();
@@ -23,6 +25,10 @@ export default class ExpWorld extends World {
       this.resources.items.spaceEnvTexture as THREE.CubeTexture,
       false,
     );
+    if (this.experience.debug.active) {
+      this.compass = new Compass(this.experience, this.scene)
+      this.compass.init()
+    }
     // const ambientLight = new THREE.AmbientLight()
     // this.scene.add(ambientLight)
     this.firecamp = new Campfire();
@@ -31,16 +37,17 @@ export default class ExpWorld extends World {
     // this.moon.init()
     this.earth = new Earth();
     this.sun = new Sun();
+    this.createStick()
 
     this.scene.add(this.sun.mesh)
-    if (this.experience.debug.active) {
-      this.compass = new Compass(this.experience, this.scene)
-      this.compass.init()
-    }
+  }
+
+  createStick = () => {
+    this.stick = new Stick()
   }
 
   update() {
-
+    this.stick.update();
   }
 
   destroy(): void {

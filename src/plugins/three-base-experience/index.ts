@@ -1,3 +1,5 @@
+import { convertStandardMaterial } from "./materials/utils/converters";
+
 // Core
 export { default as Experience } from "./experience/Experience";
 export { default as Camera } from "./experience/Camera";
@@ -23,6 +25,7 @@ export { default as Sizes } from "./utils/Sizes";
 export { default as Time } from "./utils/Time";
 export { default as Debug } from "./utils/Debug";
 export { createRoundedRectangleGeometry } from "./utils/customShapes"
+export { convertStandardMaterial } from "./materials/utils/converters"
 export * from "./utils/easing"
 
 // Shaders

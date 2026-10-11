@@ -2,7 +2,7 @@ import { Actor, Experience } from "@plugins/three-base-experience";
 import type { GLTF } from "three/examples/jsm/Addons.js";
 import * as THREE from "three/webgpu"
 
-export default class Earth extends Actor{
+export default class Earth extends Actor {
   declare public mesh: THREE.Mesh
   declare material: THREE.MeshStandardNodeMaterial
   constructor() {

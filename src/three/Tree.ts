@@ -21,7 +21,7 @@ export default class Tree extends Actor {
     makeUnique: boolean = false,
     collisionResource?: GLTF
   ) {
-    super(name, resource, autoAddToScene, makeUnique, collisionResource)
+    super(name, resource, autoAddToScene, makeUnique, true)
 
     if (!Experience.instance) return;
     this.experience = Experience.instance

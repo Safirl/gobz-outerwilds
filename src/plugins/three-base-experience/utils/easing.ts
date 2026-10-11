@@ -1,4 +1,8 @@
 // Based on https://gist.github.com/gre/1650294
+//
+export function lerp(start: number, end: number, t: number) {
+  return start + (end - start) * t;
+}
 
 // No easing, no acceleration
 export function linear( t: number ): number {

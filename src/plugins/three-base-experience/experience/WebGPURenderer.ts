@@ -41,6 +41,7 @@ export default class GPURenderer {
     this.instance.toneMappingExposure = 1.75;
     this.instance.shadowMap.enabled = true;
     this.instance.shadowMap.type = THREE.PCFShadowMap;
+    this.instance.shadowMap.transmitted = true;
     this.instance.outputColorSpace = THREE.SRGBColorSpace;
     this.instance.setClearColor(0x000000);
     this.instance.setSize(this.sizes.width, this.sizes.height);

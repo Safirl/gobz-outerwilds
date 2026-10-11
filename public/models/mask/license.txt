@@ -1,0 +1,11 @@
+Model Information:
+* title:	Outer Wilds - Nomai Mask scan
+* source:	https://sketchfab.com/3d-models/outer-wilds-nomai-mask-scan-cab879e52de8497898dd9c8048a4b5c7
+* author:	09williamsad (https://sketchfab.com/adamw1806)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Outer Wilds - Nomai Mask scan" (https://sketchfab.com/3d-models/outer-wilds-nomai-mask-scan-cab879e52de8497898dd9c8048a4b5c7) by 09williamsad (https://sketchfab.com/adamw1806) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
