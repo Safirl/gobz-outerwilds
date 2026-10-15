@@ -1,6 +1,6 @@
 import { Camera, Experience, OrbitCamera, TemplateWorld } from '@plugins/three-base-experience'
 //@ts-ignore
-import "./reset.css"
+import "./style.css"
 import ExpWorld from './three/World'
 import sources from './three/sources'
 import ExperienceCamera from './three/Camera'

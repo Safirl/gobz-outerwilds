@@ -43,8 +43,8 @@ export default class Stick extends Actor {
   initMarshmallowMaterial() {
     this.model.traverse((c) => {
       if (c instanceof THREE.Mesh) {
-        if (c.name !== this.marshmallowName) return;
         c.castShadow = false;
+        if (c.name !== this.marshmallowName) return;
         const currentMaterial = c.material as THREE.MeshStandardMaterial
         if (!currentMaterial) return;
 

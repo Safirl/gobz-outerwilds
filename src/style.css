@@ -1,0 +1,8 @@
+@import "./reset.css";
+@import "./assets/fonts.css";
+
+/*styles*/
+p {
+    font-family: "Lexend Deca";
+    font-size: 18px;
+}

@@ -1,5 +1,4 @@
-import { Actor, Camera, easeOutSine, lerp } from "@plugins/three-base-experience";
-import type { GLTF } from "three/examples/jsm/Addons.js";
+import { Camera, lerp } from "@plugins/three-base-experience";
 import * as THREE from 'three/webgpu'
 
 export default class ExperienceCamera extends Camera {
@@ -51,8 +50,8 @@ export default class ExperienceCamera extends Camera {
     );
     this.targetRotation.y = THREE.MathUtils.clamp(
       this.targetRotation.y,
-      -this.maxYaw,
-      3*this.maxYaw
+      -.5*this.maxYaw,
+      2.5*this.maxYaw
     );
   }
 

@@ -225,6 +225,13 @@ const sources: Source[] = [
     type: "texture",
     path: "textures/ground_05_1k/ground_05_ambientOcclusion_1k.png",
   },
+
+  //transitions
+  {
+    name: "portalTexture",
+    type: "texture",
+    path: "textures/transitions/fs_stylized_splash_01.png",
+  },
 ];
 
 export default sources;

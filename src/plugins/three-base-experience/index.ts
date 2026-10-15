@@ -1,9 +1,8 @@
-import { convertStandardMaterial } from "./materials/utils/converters";
-
 // Core
 export { default as Experience } from "./experience/Experience";
 export { default as Camera } from "./experience/Camera";
 export { default as Renderer } from "./experience/Renderer";
+export { default as GPURenderer } from "./experience/WebGPURenderer";
 
 //Inputs
 export { default as InputSystem } from "./inputs/InputSystem";

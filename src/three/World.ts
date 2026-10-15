@@ -6,6 +6,7 @@ import Sun from "./Sun";
 import Compass from "@plugins/three-base-experience/utils/Compass";
 import Earth from "./Earth";
 import Stick from "./Stick";
+import WakeUpTransition from "./WakeUpTransition";
 
 export default class ExpWorld extends World {
   declare experience: Experience;
@@ -38,6 +39,8 @@ export default class ExpWorld extends World {
     this.earth = new Earth();
     this.sun = new Sun();
     this.createStick()
+    const transition = new WakeUpTransition()
+    transition.init();
 
     this.scene.add(this.sun.mesh)
   }
