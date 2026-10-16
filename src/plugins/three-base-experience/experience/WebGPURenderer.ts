@@ -1,5 +1,6 @@
 import * as THREE from "three/webgpu";
 import Experience from "./Experience";
+import { pass } from "three/tsl";
 
 /**
  * Instantiate a WebGPURenderTarget
@@ -12,7 +13,7 @@ export default class GPURenderer {
   declare scene: Experience["scene"];
   declare camera: Experience["camera"];
   declare instance: THREE.WebGPURenderer;
-  // declare protected composer: EffectComposer | null;
+  declare protected renderPipeline: THREE.RenderPipeline | null;
   // declare private renderPass: RenderPass;
   // declare private outputPass: OutputPass;
 
@@ -81,51 +82,28 @@ export default class GPURenderer {
   //   this.composer.removePass(pass);
   // }
 
-  // initializeComposer() {
-  //   if (this.composer) {
-  //     console.warn("the composer has already been initialized");
-  //     return;
-  //   }
-  //   const renderTarget = new THREE.WebGLRenderTarget(800, 600, {
-  //     type: THREE.HalfFloatType,
-  //     samples: this.experience.sizes.pixelRatio < 2 ? 2 : 1,
-  //   });
-  //   this.composer = new EffectComposer(this.instance, renderTarget);
-  //   //@TODO we should add a way to have quality presets and switch between them.
-  //   // It will avoid to manually have to decrease the pixel ratio
-  //   this.composer.setPixelRatio(
-  //     Math.min(this.experience.sizes.pixelRatio, 1.5),
-  //   );
-  //   this.composer.setSize(
-  //     this.experience.sizes.width,
-  //     this.experience.sizes.height,
-  //   );
+  initializeRenderPipeline() {
+    if (this.renderPipeline) {
+      console.warn("the composer has already been initialized");
+      return;
+    }
+    this.renderPipeline = new THREE.RenderPipeline(this.instance);
+    const scenePass = pass(this.scene, this.camera.instance);
+    this.renderPipeline.outputNode = scenePass
+  }
 
-  //   this.renderPass = new RenderPass(this.scene, this.camera.instance);
-  //   this.composer.addPass(this.renderPass);
-  //   this.outputPass = new OutputPass();
-  //   this.composer.addPass(this.outputPass);
-  // }
-
-  // getRenderPass = () => {
-  //   if (!this.composer) {
-  //     this.initializeComposer();
-  //   }
-  //   return this.renderPass;
-  // };
-
-  // getOutputPass = () => {
-  //   if (!this.composer) {
-  //     this.initializeComposer();
-  //   }
-  //   return this.outputPass;
-  // };
+  getRenderPipeline = () => {
+    if (!this.renderPipeline) {
+      this.initializeRenderPipeline();
+    }
+    return this.renderPipeline!;
+  };
 
   update() {
-    // if (this.composer) {
-    //   this.composer.render();
-    // } else {
-    this.instance.render(this.scene, this.camera.instance);
-    // }
+    if (this.renderPipeline) {
+      this.renderPipeline.render();
+    } else {
+      this.instance.render(this.scene, this.camera.instance);
+    }
   }
 }

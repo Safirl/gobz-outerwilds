@@ -1,4 +1,4 @@
-import {Experience, World, Environment, OrbitCamera} from "@plugins/three-base-experience";
+import {Experience, World, Environment, OrbitCamera, GPURenderer} from "@plugins/three-base-experience";
 import * as THREE from "three/webgpu";
 import Campfire from "./Campfire";
 import Moon from "./Moon";
@@ -7,6 +7,7 @@ import Compass from "@plugins/three-base-experience/utils/Compass";
 import Earth from "./Earth";
 import Stick from "./Stick";
 import WakeUpTransition from "./WakeUpTransition";
+import PostProcess from "./PostProcess";
 
 export default class ExpWorld extends World {
   declare experience: Experience;
@@ -43,6 +44,9 @@ export default class ExpWorld extends World {
     transition.init();
 
     this.scene.add(this.sun.mesh)
+
+    const postProcess = new PostProcess(this.experience);
+    postProcess.init();
   }
 
   createStick = () => {

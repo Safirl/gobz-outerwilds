@@ -10,9 +10,9 @@ export interface Source {
  * Lifetime interface. Enables to call specific function when the experience inits, updates and destroys an object.
  */
 export interface LifeTimeObject {
-	init: () => void;
-	update: () => void;
-	destroy: () => void;
+	init(): void;
+	update(): void;
+	destroy(): void;
 }
 
 export interface Textures {
