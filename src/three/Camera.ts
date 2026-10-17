@@ -25,7 +25,7 @@ export default class ExperienceCamera extends Camera {
   setControls(): void {
     this.instance.position.set(1.87, 1.83, 1.59);
     this.instance.rotation.order = "YXZ";
-    this.instance.rotation.set(.011, .7784, 0.)
+    this.instance.lookAt(new THREE.Vector3(0., .6, 0.))
 
     const { x, y } = this.instance.rotation;
     this.currentRotation = new THREE.Vector3(x, y, 0);

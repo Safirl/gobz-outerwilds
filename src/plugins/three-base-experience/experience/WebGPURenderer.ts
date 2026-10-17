@@ -14,8 +14,6 @@ export default class GPURenderer {
   declare camera: Experience["camera"];
   declare instance: THREE.WebGPURenderer;
   declare protected renderPipeline: THREE.RenderPipeline | null;
-  // declare private renderPass: RenderPass;
-  // declare private outputPass: OutputPass;
 
   constructor() {
     if (!Experience.instance)
@@ -54,10 +52,6 @@ export default class GPURenderer {
   resize() {
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(this.sizes.pixelRatio);
-    // if (this.composer) {
-    //   this.composer.setSize(this.sizes.width, this.sizes.height);
-    //   this.composer.setPixelRatio(Math.min(this.sizes.pixelRatio, 1.5));
-    // }
   }
 
   // addComposerPass(

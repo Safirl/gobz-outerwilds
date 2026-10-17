@@ -228,9 +228,15 @@ const sources: Source[] = [
 
   //transitions
   {
-    name: "portalTexture",
+    name: "portalTexture1",
     type: "texture",
     path: "textures/transitions/fs_stylized_splash_01.png",
+  },
+
+  {
+    name: "portalTexture",
+    type: "texture",
+    path: "textures/transitions/fs_stylized_brush_16.png",
   },
 ];
 
