@@ -1,5 +1,5 @@
 import { Experience, GPURenderer, type LifeTimeObject } from "@plugins/three-base-experience";
-import { float, uv, color, mix, mrt, output, pass, texture, vec2, length } from "three/tsl";
+import { float, uv, color, mix, mrt, output, pass, texture, vec2, length, vec4, vec3, smoothstep } from "three/tsl";
 import { hashBlur } from "three/examples/jsm/tsl/display/hashBlur.js";
 import type { WebGPURenderer } from "three/webgpu";
 import * as THREE from "three/webgpu"
@@ -9,6 +9,7 @@ import gsap from "gsap";
 export default class WakeUpTransition implements LifeTimeObject {
   declare experience: Experience
   declare renderer: WebGPURenderer
+  declare baseNode: THREE.Node
 
   //uniforms
   private radius = uniform(.7);
@@ -25,8 +26,12 @@ export default class WakeUpTransition implements LifeTimeObject {
     const outputNode = renderPipeline.outputNode as THREE.RenderOutputNode;
 
     const coords = uv().sub(.5).mul(2.);
-    const radius = length(coords).add(this.radius)
-    renderPipeline.outputNode = mix(hashBlur(outputNode, this.blurStregth,{repeats: 40}), color("#0D0E18"), radius)
+    const mask = smoothstep(0.6, 1.0, length(coords).add(this.radius));
+    const transColor = color("#0D0E18");
+    const blur = hashBlur(vec4(outputNode.rgb, 1.), this.blurStregth, { repeats: 10 })
+    this.baseNode = outputNode
+    renderPipeline.outputNode = mix(blur, transColor, mask)
+    renderPipeline.needsUpdate = true;
     this.bindEvents();
   };
   bindEvents() {
@@ -39,9 +44,19 @@ export default class WakeUpTransition implements LifeTimeObject {
     })
     gsap.to(this.blurStregth, {
       value: 0.,
-      duration: 1.5
+      duration: 1.5,
+      onComplete: () => {
+        const renderer = this.experience.renderer as GPURenderer;
+        const renderPipeline = renderer.getRenderPipeline();
+
+        renderPipeline.outputNode = this.baseNode; //remove blur to improve performances.
+        renderPipeline.needsUpdate = true;
+      }
     })
   }
-  destroy() {};
+  destroy() {
+    gsap.killTweensOf(this.radius)
+    gsap.killTweensOf(this.blurStregth)
+  };
   update() {};
 }

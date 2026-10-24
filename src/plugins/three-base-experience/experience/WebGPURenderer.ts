@@ -1,6 +1,6 @@
 import * as THREE from "three/webgpu";
 import Experience from "./Experience";
-import { pass } from "three/tsl";
+import { emissive, mrt, normalWorld, output, pass, vec4 } from "three/tsl";
 
 /**
  * Instantiate a WebGPURenderTarget
@@ -13,7 +13,9 @@ export default class GPURenderer {
   declare scene: Experience["scene"];
   declare camera: Experience["camera"];
   declare instance: THREE.WebGPURenderer;
-  declare protected renderPipeline: THREE.RenderPipeline | null;
+  declare public renderPipeline: THREE.RenderPipeline | null;
+  declare public mrtNode: THREE.MRTNode
+  declare public scenePass: THREE.PassNode
 
   constructor() {
     if (!Experience.instance)
@@ -82,8 +84,35 @@ export default class GPURenderer {
       return;
     }
     this.renderPipeline = new THREE.RenderPipeline(this.instance);
-    const scenePass = pass(this.scene, this.camera.instance);
-    this.renderPipeline.outputNode = scenePass
+    this.scenePass = pass(this.scene, this.camera.instance);
+    this.createMrt();
+    // const mrtNode = mrt({
+    //   output,
+    //   emissive,
+    // })
+    // this.scenePass.setMRT(mrtNode)
+    // // this.addMrtOutputNode('emissive', emissive)
+    this.renderPipeline.outputNode = this.scenePass.getTextureNode('output');
+  }
+
+  addMrtOutputNode(name: string, node: THREE.Node) {
+    if (!this.mrtNode) {
+      throw new Error("mrt node has not been created ! Create render pipeline first before adding a MrtOutputNode.")
+    }
+    this.mrtNode.outputNodes = { ...this.mrtNode.outputNodes, [name]: node }
+    this.renderPipeline!.needsUpdate = true;
+  }
+
+  createMrt() {
+    if (this.mrtNode) {
+      return this.mrtNode;
+    }
+    const mrtNode = mrt({
+      output
+    })
+    this.scenePass.setMRT(mrtNode)
+    this.mrtNode = mrtNode;
+    return this.mrtNode;
   }
 
   getRenderPipeline = () => {

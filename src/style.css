@@ -2,7 +2,50 @@
 @import "./assets/fonts.css";
 
 /*styles*/
-p {
-    font-family: "Lexend Deca";
-    font-size: 18px;
+
+.container {
+    position: absolute;
+    color: white;
+    height: 100vh;
+    width: 100vw;
+
+    .wake-up {
+        font-family: "Lexend Deca";
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 24px;
+
+        position: absolute;
+        left: 50%;
+        top: 80%;
+        transform: translate(-50%);
+        span {
+            padding: 4px;
+            background-color: white;
+            color: #0D0E18;
+            border-radius: 8px;
+        }
+    }
+
+    .look-around {
+        font-family: "Lexend Deca";
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 24px;
+
+        position: absolute;
+        left: 0%;
+        bottom: 0%;
+        margin: 16px 24px;
+        img {
+            padding: 4px;
+            background-color: white;
+            color: #0D0E18;
+            border-radius: 8px;
+        }
+    }
+
+
 }

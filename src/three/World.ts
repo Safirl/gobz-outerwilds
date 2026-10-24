@@ -31,6 +31,8 @@ export default class ExpWorld extends World {
       this.compass = new Compass(this.experience, this.scene)
       this.compass.init()
     }
+    const postProcess = new PostProcess(this.experience);
+    postProcess.init();
     // const ambientLight = new THREE.AmbientLight()
     // this.scene.add(ambientLight)
     this.firecamp = new Campfire();
@@ -40,13 +42,11 @@ export default class ExpWorld extends World {
     this.earth = new Earth();
     this.sun = new Sun();
     this.createStick()
-    const transition = new WakeUpTransition()
-    transition.init();
 
     this.scene.add(this.sun.mesh)
 
-    const postProcess = new PostProcess(this.experience);
-    postProcess.init();
+    const transition = new WakeUpTransition()
+    transition.init();
   }
 
   createStick = () => {

@@ -1,7 +1,7 @@
 import { Debug, Experience, StaticObject, type LifeTimeObject } from "@plugins/three-base-experience";
 import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
 import { smoothstep } from "three/src/nodes/TSL.js";
-import { color, deltaTime, float, mix, mx_fractal_noise_float, positionLocal, remap, time, uniform } from "three/tsl";
+import { color, deltaTime, float, mix, mrt, mx_fractal_noise_float, output, positionLocal, remap, time, uniform } from "three/tsl";
 import * as THREE from "three/webgpu"
 
 
@@ -40,9 +40,11 @@ export default class Sun extends StaticObject {
     this.geometry = new THREE.SphereGeometry(50, 200, 200)
   }
   setMaterial() {
-    this.material = new THREE.MeshStandardNodeMaterial({
-      // ems
+    this.material = new THREE.MeshStandardNodeMaterial()
+    this.material.mrtNode = mrt({
+      bloomIntensity: float(1.)
     })
+    this.material.needsUpdate = true;
     const coords = positionLocal.remap(float(-1), float(1), float(0), float(1)).mul(float(this.maskScale))
     const blendFactor = remap(mx_fractal_noise_float(coords.add(time.mul(this.speed)), 2.).r, 0., 1., this.spread, 1.)
     // const color = smoothstep(0., .3, blendFactor)

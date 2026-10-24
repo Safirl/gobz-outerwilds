@@ -1,6 +1,6 @@
 import { Actor, Debug, Experience, type LifeTimeObject } from "@plugins/three-base-experience";
 import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
-import { mx_noise_float, uniform, uv, mx_fractal_noise_float, time, vec2, texture, remap, min, positionLocal, vec4, saturate, mix, billboarding, range, rotateUV, color, Fn } from "three/tsl";
+import { mx_noise_float, uniform, uv, mx_fractal_noise_float, time, vec2, texture, remap, min, positionLocal, vec4, saturate, mix, billboarding, range, rotateUV, color, Fn, mrt, output, float } from "three/tsl";
 //@ts-ignore
 import { perlinNoise } from "tsl-textures";
 import * as THREE from "three/webgpu"
@@ -74,6 +74,9 @@ export default class Campfire implements LifeTimeObject{
     const smokeColor = mix(this.smokeColor.mul(.02), color(0x222222), positionLocal.y.mul(3).clamp());
 
     const smokeNodeMaterial = new THREE.SpriteNodeMaterial();
+    smokeNodeMaterial.mrtNode = mrt({
+      bloomIntensity: float(1.)
+    })
     smokeNodeMaterial.colorNode = smokeColor//mix(this.fireCenterColor, smokeColor, life.mul(2.5).min(1)).mul(fakeLightEffect);
     // smokeNodeMaterial.colorNode = mix(color(0xf27d0c), smokeColor, life.mul(2.5).min(1)).mul(fakeLightEffect);
     smokeNodeMaterial.opacityNode = opacityNode;
@@ -113,6 +116,9 @@ export default class Campfire implements LifeTimeObject{
       depthWrite: false,
       // depthTest: false
     })
+    this.fireMaterial.mrtNode = mrt({
+      bloomIntensity: float(1.)
+    })
 
     const coords = uv().sub(.5).mul(2)
     const offsetTime = vec2(0, time.mul(this.distorsionSpeed).negate())
@@ -151,6 +157,9 @@ export default class Campfire implements LifeTimeObject{
       if (child instanceof THREE.Mesh) {
         const childMaterial = child.material as THREE.MeshStandardMaterial
         const meshMaterial = convertStandardMaterial(childMaterial);
+        // meshMaterial.mrtNode = mrt({
+        //   bloomIntensity: float(1.)
+        // })
 
         const n = mx_noise_float(positionLocal.mul(10).add(time)).mul(0.5).add(0.5)
         const shadownColor = color("#fff")
