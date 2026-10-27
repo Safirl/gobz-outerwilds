@@ -1,7 +1,7 @@
 import { Debug, Experience, StaticObject, type LifeTimeObject } from "@plugins/three-base-experience";
 import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
 import { smoothstep } from "three/src/nodes/TSL.js";
-import { color, deltaTime, float, mix, mrt, mx_fractal_noise_float, output, positionLocal, remap, time, uniform } from "three/tsl";
+import { atan, color, cos, deltaTime, float, mix, mrt, mx_fractal_noise_float, mx_noise_float, output, positionLocal, remap, sin, time, uniform, uv } from "three/tsl";
 import * as THREE from "three/webgpu"
 
 
@@ -27,6 +27,17 @@ export default class Sun extends StaticObject {
   public smoothBlend = uniform(.5)
   public emissiveIntensity = uniform(1.)
 
+  /**
+   * EXPLOSION
+   */
+  declare private explosionMesh: THREE.Mesh
+
+  /**
+   * Explosion uniforms
+   */
+  public ondulationSpeed = uniform(1.);
+  public ondulationScale = uniform(1.);
+
   constructor() {
     super()
     this.init()
@@ -34,6 +45,7 @@ export default class Sun extends StaticObject {
   init = () => {
     super.init()
     this.mesh.position.set(-346.86, -26.50, -234.20)
+    this.createExplosionMesh();
     this.setDebugObject()
   };
   setGeometry() {
@@ -58,6 +70,21 @@ export default class Sun extends StaticObject {
     super.setMesh()
   }
 
+  createExplosionMesh() {
+    const geometry = new THREE.SphereGeometry(65, 50, 50)
+    const material = new THREE.MeshBasicNodeMaterial();
+    material.colorNode = uv();
+
+    const radius = sin(mx_noise_float(positionLocal.add(time.mul(this.ondulationSpeed)))).mul(this.ondulationScale);
+    atan
+    positionLocal.x.addAssign(cos())
+    material.positionNode = newPosNode
+
+    this.explosionMesh = new THREE.Mesh(geometry, material);
+    this.scene.add(this.explosionMesh)
+    this.explosionMesh.position.copy(this.mesh.position);
+  }
+
   setDebugObject = () => {
     if (!this.experience.debug.active) return;
     this.debug = this.experience.debug
@@ -68,6 +95,10 @@ export default class Sun extends StaticObject {
     this.debugFolder.add(this.speed, "value", 0., 10., .1).name("noise speed")
     this.debugFolder.add(this.smoothBlend, "value", 0., .5, .01).name("smooth blend")
     this.debugFolder.add(this.emissiveIntensity, "value", 0., 10., .01).name("emissive intensity")
+
+    const explosionFolder = this.debugFolder.addFolder("Explosion");
+    explosionFolder.add(this.ondulationSpeed, "value", 0., 10., .01).name("Ondulation Speed");
+    explosionFolder.add(this.ondulationScale, "value", 0., 1000., .01).name("Ondulation Scale");
     //colors
     // this.debugFolder.addColor(this.red, "").name("color 1")
 

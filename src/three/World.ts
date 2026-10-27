@@ -20,6 +20,9 @@ export default class ExpWorld extends World {
   declare earth: Earth
   declare compass: Compass
   declare stick: Stick
+  public isAwake = false;
+
+  declare private transition: WakeUpTransition
 
   init() {
     super.init();
@@ -45,8 +48,13 @@ export default class ExpWorld extends World {
 
     this.scene.add(this.sun.mesh)
 
-    const transition = new WakeUpTransition()
-    transition.init();
+    this.transition = new WakeUpTransition()
+    this.transition.on("onAwake", () => this.switchIsAwake)
+    this.transition.init();
+  }
+
+  switchIsAwake = () => {
+    this.isAwake = !this.isAwake
   }
 
   createStick = () => {

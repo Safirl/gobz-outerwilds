@@ -8,6 +8,7 @@
     color: white;
     height: 100vh;
     width: 100vw;
+    pointer-events: none;
 
     .wake-up {
         font-family: "Lexend Deca";
@@ -39,6 +40,7 @@
         left: 0%;
         bottom: 0%;
         margin: 16px 24px;
+        opacity: 0;
         img {
             padding: 4px;
             background-color: white;
