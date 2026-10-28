@@ -1,7 +1,7 @@
 import { Debug, Experience, StaticObject, type LifeTimeObject } from "@plugins/three-base-experience";
 import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
 import { smoothstep } from "three/src/nodes/TSL.js";
-import { atan, color, cos, deltaTime, float, mix, mrt, mx_fractal_noise_float, mx_noise_float, output, positionLocal, remap, sin, time, uniform, uv } from "three/tsl";
+import { atan, color, cos, deltaTime, float, mix, mrt, mx_fractal_noise_float, mx_noise_float, output, positionLocal, remap, sin, time, uniform, uv, vec3 } from "three/tsl";
 import * as THREE from "three/webgpu"
 
 
@@ -36,7 +36,8 @@ export default class Sun extends StaticObject {
    * Explosion uniforms
    */
   public ondulationSpeed = uniform(1.);
-  public ondulationScale = uniform(1.);
+  public ondulationScale = uniform(2.);
+  public ondulationNoiseScale = uniform(.1);
 
   constructor() {
     super()
@@ -54,7 +55,7 @@ export default class Sun extends StaticObject {
   setMaterial() {
     this.material = new THREE.MeshStandardNodeMaterial()
     this.material.mrtNode = mrt({
-      bloomIntensity: float(1.)
+      bloomIntensity: float(.1)
     })
     this.material.needsUpdate = true;
     const coords = positionLocal.remap(float(-1), float(1), float(0), float(1)).mul(float(this.maskScale))
@@ -71,14 +72,26 @@ export default class Sun extends StaticObject {
   }
 
   createExplosionMesh() {
-    const geometry = new THREE.SphereGeometry(65, 50, 50)
-    const material = new THREE.MeshBasicNodeMaterial();
-    material.colorNode = uv();
+    const geometry = new THREE.SphereGeometry(65, 200, 200)
+    const material = new THREE.MeshStandardNodeMaterial({
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+    material.mrtNode = mrt({
+      bloomIntensity: float(1.)
+    })
+    this.material.needsUpdate = true;
+    material.opacity = .1;
 
-    const radius = sin(mx_noise_float(positionLocal.add(time.mul(this.ondulationSpeed)))).mul(this.ondulationScale);
-    atan
-    positionLocal.x.addAssign(cos())
-    material.positionNode = newPosNode
+    const dirNode = positionLocal.normalize();
+    const scaledPos = positionLocal.mul(float(this.ondulationNoiseScale))
+    const noise = mx_noise_float(scaledPos.add(time.mul(this.ondulationSpeed)))
+    const displacement = positionLocal.add(dirNode.mul(sin(noise)).mul(this.ondulationScale))
+
+    material.positionNode = displacement;
+    const remappedFactor = remap(0., 1., .5, 1., noise.r)
+    material.emissiveNode = this.yellow.mul(this.emissiveIntensity)
+    material.colorNode = mix(this.orange, this.yellow, noise.r);
 
     this.explosionMesh = new THREE.Mesh(geometry, material);
     this.scene.add(this.explosionMesh)
@@ -98,7 +111,8 @@ export default class Sun extends StaticObject {
 
     const explosionFolder = this.debugFolder.addFolder("Explosion");
     explosionFolder.add(this.ondulationSpeed, "value", 0., 10., .01).name("Ondulation Speed");
-    explosionFolder.add(this.ondulationScale, "value", 0., 1000., .01).name("Ondulation Scale");
+    explosionFolder.add(this.ondulationScale, "value", 0., 20., .01).name("Ondulation Scale");
+    explosionFolder.add(this.ondulationNoiseScale, "value", 0., 10., .001).name("Ondulation Noise Scale");
     //colors
     // this.debugFolder.addColor(this.red, "").name("color 1")
 
