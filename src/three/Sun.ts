@@ -3,6 +3,7 @@ import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Paramete
 import { smoothstep } from "three/src/nodes/TSL.js";
 import { atan, color, cos, deltaTime, float, mix, mrt, mx_fractal_noise_float, mx_noise_float, output, positionLocal, remap, sin, time, uniform, uv, vec3 } from "three/tsl";
 import * as THREE from "three/webgpu"
+import gsap from "gsap";
 
 
 export default class Sun extends StaticObject {
@@ -11,11 +12,17 @@ export default class Sun extends StaticObject {
   declare material: THREE.MeshStandardNodeMaterial;
 
   /**
+   * variables
+   */
+  public sunScale: number = 1.;
+
+  /**
    * Palette
    */
   public red = color("#FF4200")
   public orange = color("#FF9300")
   public yellow = color("#FFAE00")
+  public lightBlue = color("#8DFEFF")
 
   /**
    * Uniforms
@@ -26,6 +33,9 @@ export default class Sun extends StaticObject {
   public speed = uniform(.1)
   public smoothBlend = uniform(.5)
   public emissiveIntensity = uniform(1.)
+
+  public darkColour = uniform(this.red)
+  public highColour = uniform(this.yellow)
 
   /**
    * EXPLOSION
@@ -55,7 +65,7 @@ export default class Sun extends StaticObject {
   setMaterial() {
     this.material = new THREE.MeshStandardNodeMaterial()
     this.material.mrtNode = mrt({
-      bloomIntensity: float(.1)
+      bloomIntensity: float(1.)
     })
     this.material.needsUpdate = true;
     const coords = positionLocal.remap(float(-1), float(1), float(0), float(1)).mul(float(this.maskScale))
@@ -63,6 +73,7 @@ export default class Sun extends StaticObject {
     // const color = smoothstep(0., .3, blendFactor)
     const maskMap = smoothstep(float(.5).sub(this.smoothBlend), float(.5).add(this.smoothBlend), blendFactor)
     this.material.emissiveNode = mix(this.red, this.yellow, maskMap).mul(this.emissiveIntensity)
+    // this.material.emissiveNode = mix(this.lightBlue,color("white"), maskMap).mul(this.emissiveIntensity)
   }
   setTextures(): void {
 
@@ -80,7 +91,7 @@ export default class Sun extends StaticObject {
     material.mrtNode = mrt({
       bloomIntensity: float(1.)
     })
-    this.material.needsUpdate = true;
+    material.needsUpdate = true;
     material.opacity = .1;
 
     const dirNode = positionLocal.normalize();
@@ -89,7 +100,7 @@ export default class Sun extends StaticObject {
     const displacement = positionLocal.add(dirNode.mul(sin(noise)).mul(this.ondulationScale))
 
     material.positionNode = displacement;
-    const remappedFactor = remap(0., 1., .5, 1., noise.r)
+    // const remappedFactor = remap(0., 1., .5, 1., noise.r)
     material.emissiveNode = this.yellow.mul(this.emissiveIntensity)
     material.colorNode = mix(this.orange, this.yellow, noise.r);
 
@@ -109,13 +120,45 @@ export default class Sun extends StaticObject {
     this.debugFolder.add(this.smoothBlend, "value", 0., .5, .01).name("smooth blend")
     this.debugFolder.add(this.emissiveIntensity, "value", 0., 10., .01).name("emissive intensity")
 
-    const explosionFolder = this.debugFolder.addFolder("Explosion");
+    const explosionFolder = this.debugFolder.addFolder("💥 Explosion");
     explosionFolder.add(this.ondulationSpeed, "value", 0., 10., .01).name("Ondulation Speed");
     explosionFolder.add(this.ondulationScale, "value", 0., 20., .01).name("Ondulation Scale");
     explosionFolder.add(this.ondulationNoiseScale, "value", 0., 10., .001).name("Ondulation Noise Scale");
+    explosionFolder.add(this, "sunScale", 0., 5., .001).name("Scale").onChange(this.updateSunScale);
+    explosionFolder.add(this, "triggerSunExplosion");
     //colors
     // this.debugFolder.addColor(this.red, "").name("color 1")
 
+  }
+
+  updateSunScale = () => {
+    this.mesh.scale.setScalar(this.sunScale);
+    if (this.explosionMesh) {
+      this.explosionMesh.scale.setScalar(this.sunScale);
+    }
+  }
+
+  triggerSunExplosion = () => {
+    //1. sunScale
+    let scaleTl = gsap.timeline({
+      onUpdate: this.updateSunScale
+    });
+    scaleTl
+      .to(this, {
+        "sunScale": 2.,
+      })
+      .to(this, {
+        "sunScale": 0.1,
+      })
+      .to(this, {
+        "sunScale": 9.,
+      })
+
+    //2. sun colour
+    let colourTl = gsap.timeline();
+    colourTl.to(this.darkColour, {
+      "value": this.red
+    })
   }
 
   update = () => {};
