@@ -44,7 +44,7 @@ export default class ExpWorld extends World {
     // this.moon.init()
     this.earth = new Earth();
     this.sun = new Sun();
-    this.createStick()
+    // this.createStick()
 
     this.scene.add(this.sun.mesh)
 
@@ -62,7 +62,9 @@ export default class ExpWorld extends World {
   }
 
   update() {
-    this.stick.update();
+    if (this.stick) {
+      this.stick.update();
+    }
   }
 
   destroy(): void {

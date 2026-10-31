@@ -19,10 +19,14 @@ export default class Sun extends StaticObject {
   /**
    * Palette
    */
-  public red = color("#FF4200")
-  public orange = color("#FF9300")
-  public yellow = color("#FFAE00")
-  public lightBlue = color("#8DFEFF")
+  public endSunLowRed = new THREE.Color("rgb(102,27,0)")
+  public endSunHighRed = new THREE.Color("rgb(217,13,13)")
+  public endSunlightBlue = new THREE.Color("#8DFEFF")
+
+
+  public red = new THREE.Color("#FF4200")
+  public orange = new THREE.Color("#FF9300")
+  public yellow = new THREE.Color("#FFAE00")
 
   /**
    * Uniforms
@@ -34,8 +38,8 @@ export default class Sun extends StaticObject {
   public smoothBlend = uniform(.5)
   public emissiveIntensity = uniform(1.)
 
-  public darkColour = uniform(this.red)
-  public highColour = uniform(this.yellow)
+  public lowColor = uniform(this.red)
+  public highColor = uniform(this.yellow)
 
   /**
    * EXPLOSION
@@ -72,7 +76,7 @@ export default class Sun extends StaticObject {
     const blendFactor = remap(mx_fractal_noise_float(coords.add(time.mul(this.speed)), 2.).r, 0., 1., this.spread, 1.)
     // const color = smoothstep(0., .3, blendFactor)
     const maskMap = smoothstep(float(.5).sub(this.smoothBlend), float(.5).add(this.smoothBlend), blendFactor)
-    this.material.emissiveNode = mix(this.red, this.yellow, maskMap).mul(this.emissiveIntensity)
+    this.material.emissiveNode = mix(this.lowColor, this.highColor, maskMap).mul(this.emissiveIntensity)
     // this.material.emissiveNode = mix(this.lightBlue,color("white"), maskMap).mul(this.emissiveIntensity)
   }
   setTextures(): void {
@@ -101,11 +105,11 @@ export default class Sun extends StaticObject {
 
     material.positionNode = displacement;
     // const remappedFactor = remap(0., 1., .5, 1., noise.r)
-    material.emissiveNode = this.yellow.mul(this.emissiveIntensity)
-    material.colorNode = mix(this.orange, this.yellow, noise.r);
+    material.emissiveNode = this.highColor.mul(this.emissiveIntensity)
+    material.colorNode = mix(this.lowColor, this.highColor, noise.r);
 
     this.explosionMesh = new THREE.Mesh(geometry, material);
-    this.scene.add(this.explosionMesh)
+    // this.scene.add(this.explosionMesh)
     this.explosionMesh.position.copy(this.mesh.position);
   }
 
@@ -119,6 +123,9 @@ export default class Sun extends StaticObject {
     this.debugFolder.add(this.speed, "value", 0., 10., .1).name("noise speed")
     this.debugFolder.add(this.smoothBlend, "value", 0., .5, .01).name("smooth blend")
     this.debugFolder.add(this.emissiveIntensity, "value", 0., 10., .01).name("emissive intensity")
+
+    this.debugFolder.addColor(this.lowColor, "value").name("low sun color")
+    this.debugFolder.addColor(this.highColor, "value").name("high sun color")
 
     const explosionFolder = this.debugFolder.addFolder("💥 Explosion");
     explosionFolder.add(this.ondulationSpeed, "value", 0., 10., .01).name("Ondulation Speed");
@@ -139,26 +146,70 @@ export default class Sun extends StaticObject {
   }
 
   triggerSunExplosion = () => {
-    //1. sunScale
-    let scaleTl = gsap.timeline({
-      onUpdate: this.updateSunScale
-    });
-    scaleTl
-      .to(this, {
-        "sunScale": 2.,
-      })
-      .to(this, {
-        "sunScale": 0.1,
-      })
-      .to(this, {
-        "sunScale": 9.,
-      })
+    let durations = {
+      sunScaling: 15
+    }
 
-    //2. sun colour
-    let colourTl = gsap.timeline();
-    colourTl.to(this.darkColour, {
-      "value": this.red
-    })
+    let sunScalingTl = gsap.timeline({ onUpdate: this.updateSunScale })
+    sunScalingTl.to(this, {
+      "sunScale": 2.,
+      duration: durations.sunScaling,
+      ease: "sine.inOut"
+    }, 0)
+    .to(this.lowColor.value, {
+      "r": this.endSunLowRed.r,
+      "g": this.endSunLowRed.g,
+      "b": this.endSunLowRed.b,
+      duration: durations.sunScaling,
+      ease: "sine.inOut"
+    }, 0)
+    .to(this.highColor.value, {
+      "r": this.endSunHighRed.r,
+      "g": this.endSunHighRed.g,
+      "b": this.endSunHighRed.b,
+      duration: durations.sunScaling,
+      ease: "sine.inOut"
+    }, 0)
+    .to(this.emissiveIntensity, {
+      "value": 2.,
+      duration: durations.sunScaling,
+      ease: "sine.inOut"
+    }, 0)
+
+    //1. sunScale
+    // let scaleTl = gsap.timeline({
+    //   onUpdate: this.updateSunScale
+    // });
+    // scaleTl
+    //   .to(this, {
+    //     "sunScale": 2.,
+    //     duration: 10,
+    //     ease: "sine.inOut"
+    //   })
+    //   .to(this, {
+    //     "sunScale": 0.1,
+    //     ease: "power2.inOut",
+    //     duration: 3
+    //   })
+    //   .to(this, {
+    //     "sunScale": 9.,
+    //     duration: 5
+    //   })
+
+    //2. sun color
+    // let colorTl = gsap.timeline();
+    // colorTl.to(this.lowColor.value, {
+    //   "r": this.endSunLowRed.r,
+    //   "g": this.endSunLowRed.g,
+    //   "b": this.endSunLowRed.b,
+    //   duration: 10
+    // }, 0)
+    // colorTl.to(this.highColor.value, {
+    //   "r": this.endSunHighRed.r,
+    //   "g": this.endSunHighRed.g,
+    //   "b": this.endSunHighRed.b,
+    //    duration: 10
+    // }, 0)
   }
 
   update = () => {};
