@@ -2,6 +2,9 @@ import * as THREE from "three/webgpu";
 import type Resources from "../utils/Resources";
 import Experience from "../experience/Experience";
 import type { LifeTimeObject, Textures } from "../types/types";
+import { EventEmitter } from "../utils/EventEmitter";
+import type Debug from "../utils/Debug";
+import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
 
 /**
  * Base class to create static object, such as floor or walls. It uses a Mesh standard material
@@ -17,6 +20,9 @@ export default abstract class StaticObject implements LifeTimeObject {
   declare receiveShadows: boolean;
   declare castShadow: boolean;
   private id: string = crypto.randomUUID();
+
+  declare debug: Debug;
+  declare debugFolder: ParametersGroup;
 
   constructor(
     textures?: Textures[],
@@ -37,6 +43,7 @@ export default abstract class StaticObject implements LifeTimeObject {
 
     this.scene = Experience.instance.scene;
     this.resources = Experience.instance.resources;
+    this.debug = Experience.instance.debug
   }
 
   getId(): string {
@@ -48,6 +55,9 @@ export default abstract class StaticObject implements LifeTimeObject {
     this.setTextures();
     this.setMaterial();
     this.setMesh();
+    // if (this.debug.active) {
+    //   this.setDebugObject();
+    // }
   }
   update() {}
   destroy() {}
@@ -55,9 +65,12 @@ export default abstract class StaticObject implements LifeTimeObject {
   /**
    * Override this function to set the geometry
    */
-  setGeometry() {
-    // console.log(rhis)
-  }
+  setGeometry() { }
+
+  /**
+   * Override to provide a debug folder and parameters.
+   */
+  setDebugObject(): void { }
 
   /**
    * Called when the textures are set. If the texture object is valid, it will set the corresponding texture for the object.

@@ -1,4 +1,4 @@
-import {Experience, World, Environment, OrbitCamera, GPURenderer} from "@plugins/three-base-experience";
+import {Experience, World, Environment, OrbitCamera, GPURenderer, Debug} from "@plugins/three-base-experience";
 import * as THREE from "three/webgpu";
 import Campfire from "./Campfire";
 import Moon from "./Moon";
@@ -7,7 +7,9 @@ import Compass from "@plugins/three-base-experience/utils/Compass";
 import Earth from "./Earth";
 import Stick from "./Stick";
 import WakeUpTransition from "./WakeUpTransition";
-import PostProcess from "./PostProcess";
+import BloomPostProcess from "./BloomPostProcess";
+import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
+import BurnPostProcess from "./BurnPostProcess";
 
 export default class ExpWorld extends World {
   declare experience: Experience;
@@ -21,11 +23,28 @@ export default class ExpWorld extends World {
   declare compass: Compass
   declare stick: Stick
   public isAwake = false;
+  declare private bloomPostProcess: BloomPostProcess
+  declare private burnPostProcess: BurnPostProcess
+
+  declare debug: Debug
+  declare debugFolder: ParametersGroup
 
   declare private transition: WakeUpTransition
 
+  public transitionDurations = {
+    sunScaling: 3,//15,
+    sunScalingDown: 3.,//7.
+    sunExplosion: 10.//7.
+  }
+
   init() {
     super.init();
+
+    this.debug = this.experience.debug
+    if (this.debug.active) {
+      this.setDebugObject();
+    }
+
     this.environment = new Environment(
       this.resources.items.spaceEnvTexture as THREE.CubeTexture,
       false,
@@ -34,8 +53,10 @@ export default class ExpWorld extends World {
       this.compass = new Compass(this.experience, this.scene)
       this.compass.init()
     }
-    const postProcess = new PostProcess(this.experience);
-    postProcess.init();
+    this.bloomPostProcess = new BloomPostProcess(this.experience);
+    this.burnPostProcess = new BurnPostProcess(this.experience);
+    this.bloomPostProcess.init();
+    this.burnPostProcess.init();
     // const ambientLight = new THREE.AmbientLight()
     // this.scene.add(ambientLight)
     this.firecamp = new Campfire();
@@ -51,6 +72,17 @@ export default class ExpWorld extends World {
     this.transition = new WakeUpTransition()
     this.transition.on("onAwake", () => this.switchIsAwake)
     this.transition.init();
+  }
+
+  setDebugObject = () => {
+    this.debugFolder = this.debug.inspector.createParameters("GENERAL")
+    this.debugFolder.add(this, "triggerSunExplosion")
+  }
+
+  triggerSunExplosion = () => {
+    this.sun.triggerSunExplosion();
+    this.environment.triggerSunExplosion();
+    this.burnPostProcess.triggerSunExplosion()
   }
 
   switchIsAwake = () => {

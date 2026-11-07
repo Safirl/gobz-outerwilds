@@ -4,6 +4,8 @@ import type Debug from "../utils/Debug";
 import EnvironmentMap from "./EnvironmentMap";
 import type { LifeTimeObject } from "../types/types";
 import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
+import gsap from "gsap";
+import type ExpWorld from "../../../three/World";
 
 export default class Environment implements LifeTimeObject {
 	declare shadowHelper: THREE.CameraHelper;
@@ -14,7 +16,11 @@ export default class Environment implements LifeTimeObject {
 	declare environmentMap: EnvironmentMap;
 	declare debug: Debug;
 	declare debugFolder: ParametersGroup;
-	declare protected sunlightDebugFolder: ParametersGroup;
+  declare protected sunlightDebugFolder: ParametersGroup;
+  declare private world: ExpWorld;
+
+  public endSunHighRed = new THREE.Color("#D47560")
+  public endSunHighBlue = new THREE.Color("#8DFEFF")
 
 	constructor(
 		lightingEnvironmentMap?: THREE.CubeTexture,
@@ -30,7 +36,9 @@ export default class Environment implements LifeTimeObject {
 		this.scene = this.experience.scene;
 		this.resources = this.experience.resources;
 
-		this.debug = this.experience.debug;
+    this.debug = this.experience.debug;
+
+    this.world = this.experience.world as ExpWorld;
 
 		if (this.debug.active) {
 			this.debugFolder = this.debug.inspector.createParameters("🗺️ environment");
@@ -98,7 +106,32 @@ export default class Environment implements LifeTimeObject {
 	setEnvironmentMapIntensity(intensity: number) {
 		this.environmentMap.intensity = intensity;
 		this.environmentMap.updateMaterials();
-	}
+  }
+
+  triggerSunExplosion = () => {
+    const tl = gsap.timeline()
+    this.sunLight.intensity
+    tl.to(this.sunLight.color, {
+      "r": this.endSunHighRed.r,
+      "g": this.endSunHighRed.g,
+      "b": this.endSunHighRed.b,
+      duration: this.world.transitionDurations.sunScaling
+    })
+    .to(this.sunLight, {
+      "intensity": .1,
+      duration: this.world.transitionDurations.sunScalingDown
+    })
+    .to(this.sunLight.color, {
+      "r": this.endSunHighBlue.r,
+      "g": this.endSunHighBlue.g,
+      "b": this.endSunHighBlue.b,
+      duration: this.world.transitionDurations.sunExplosion
+    })
+    .to(this.sunLight, {
+      "intensity": 8.,
+      duration: this.world.transitionDurations.sunExplosion
+    }, "<")
+  }
 
 	setDebugObject() {
 		if (this.debug.active) {

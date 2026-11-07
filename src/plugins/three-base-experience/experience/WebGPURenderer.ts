@@ -56,28 +56,6 @@ export default class GPURenderer {
     this.instance.setPixelRatio(this.sizes.pixelRatio);
   }
 
-  // addComposerPass(
-  //   pass: Pass,
-  //   afterGammaCorrectionPass?: boolean,
-  //   index?: number,
-  // ) {
-  //   if (!this.composer) {
-  //     this.initializeComposer();
-  //   }
-  //   if (typeof index === "number") {
-  //     this.composer?.insertPass(pass, index);
-  //   } else if (!afterGammaCorrectionPass) {
-  //     this.composer?.insertPass(pass, this.composer.passes.length - 1);
-  //   } else {
-  //     this.composer?.addPass(pass);
-  //   }
-  // }
-
-  // removeComposerPass(pass: Pass) {
-  //   if (!this.composer) return;
-  //   this.composer.removePass(pass);
-  // }
-
   initializeRenderPipeline() {
     if (this.renderPipeline) {
       console.warn("the composer has already been initialized");
@@ -86,12 +64,6 @@ export default class GPURenderer {
     this.renderPipeline = new THREE.RenderPipeline(this.instance);
     this.scenePass = pass(this.scene, this.camera.instance);
     this.createMrt();
-    // const mrtNode = mrt({
-    //   output,
-    //   emissive,
-    // })
-    // this.scenePass.setMRT(mrtNode)
-    // // this.addMrtOutputNode('emissive', emissive)
     this.renderPipeline.outputNode = this.scenePass.getTextureNode('output');
   }
 
