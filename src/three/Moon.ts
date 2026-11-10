@@ -8,10 +8,11 @@ import { float, Fn, mix, mx_fractal_noise_float, normalMap, remap, smoothstep, u
 import { positionLocal } from "three/src/nodes/TSL.js";
 
 export default class Moon extends StaticObject{
-  declare private debug: Debug
-  declare private debugFolder: ParametersGroup
+  declare debug: Debug
+  declare debugFolder: ParametersGroup
   declare material: THREE.MeshStandardNodeMaterial;
   declare character: THREE.Object3D
+  declare trees: Tree[]
 
   public treeTheta = { value: -3.14159265358979 }
   public treePhi = {value: 1.42}
@@ -36,8 +37,16 @@ export default class Moon extends StaticObject{
 
   };
 
+  addToGroup(group: THREE.Group) {
+    const treeModels = this.trees.map((t) => t.model)
+    group.add(this.mesh, this.character)
+    treeModels.forEach((t) => {
+      group.add(t);
+    })
+  }
+
   createCharacter = () => {
-    const character = new Actor("character", this.experience.resources.items.characterModel as GLTF, true, false)
+    const character = new Actor("character", this.experience.resources.items.characterModel as GLTF, false, false)
     this.character = character.model
     this.character.receiveShadow = false
     character.model.position.set(-1.16, -0.09, -3.45)
@@ -45,12 +54,14 @@ export default class Moon extends StaticObject{
   }
 
   createTrees = () => {
-    new Tree(1.718,1.621,  this.radius, this.mesh.position, "tree 1", this.experience.resources.items.treeModel2 as GLTF, true, true)
-    new Tree(1.914,0.1963,  this.radius, this.mesh.position, "tree 2", this.experience.resources.items.treeModel2 as GLTF, true, true)
-    new Tree(1.81,-0.351,  this.radius, this.mesh.position, "tree 3", this.experience.resources.items.treeModel2 as GLTF, true, true)
-    // new Tree(2.01,0.58,  this.radius, this.mesh.position, "tree 4", this.experience.resources.items.treeModel2 as GLTF, true, true)
-    new Tree(1.914,1.129,  this.radius, this.mesh.position, "tree 5", this.experience.resources.items.treeModel2 as GLTF, true, true)
-    new Tree(1.03,-3.00,  this.radius, this.mesh.position, "tree 6", this.experience.resources.items.treeModel2 as GLTF, true, true)
+    this.trees = [
+      new Tree(1.718,1.621,  this.radius, this.mesh.position, "tree 1", this.experience.resources.items.treeModel2 as GLTF, false, true),
+      new Tree(1.914,0.1963,  this.radius, this.mesh.position, "tree 2", this.experience.resources.items.treeModel2 as GLTF, false, true),
+      new Tree(1.81,-0.351,  this.radius, this.mesh.position, "tree 3", this.experience.resources.items.treeModel2 as GLTF, false, true),
+      // new Tree(2.01,0.58,  this.radius, this.mesh.position, "tree 4", this.experience.resources.items.treeModel2 as GLTF, true, true),
+      new Tree(1.914,1.129,  this.radius, this.mesh.position, "tree 5", this.experience.resources.items.treeModel2 as GLTF, false, true),
+      new Tree(1.03,-3.00,  this.radius, this.mesh.position, "tree 6", this.experience.resources.items.treeModel2 as GLTF, false, true)
+    ]
   }
 
   setGeometry(): void {
@@ -159,7 +170,7 @@ export default class Moon extends StaticObject{
     this.mesh.rotateX(Math.PI/4)
     this.mesh.position.y = -this.radius
     this.mesh.receiveShadow = true;
-    this.scene.add(this.mesh);
+    // this.scene.add(this.mesh);
   }
 
   setDebugObject = () => {

@@ -53,6 +53,7 @@ export default class WakeUpTransition extends EventEmitter implements LifeTimeOb
   }
   openEyes = () => {
     if (this.world.isAwake) return;
+    this.experience.canvas.removeEventListener("click", this.openEyes)
 
     gsap.to(this.radius, {
       value: -1,

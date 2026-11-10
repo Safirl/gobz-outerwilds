@@ -7,8 +7,11 @@ export default class Earth extends Actor {
   declare material: THREE.MeshStandardNodeMaterial
   constructor() {
     if (!Experience.instance) return;
-    super("earth", Experience.instance?.resources.items.earthModel as GLTF, true, false)
+    super("earth", Experience.instance?.resources.items.earthModel as GLTF, false, false)
     this.init()
+  }
+  addToGroup(group: THREE.Group) {
+    group.add(this.model)
   }
   init = () => {
     this.model.position.set(-258.56, 36.51, -307)

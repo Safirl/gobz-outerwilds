@@ -232,7 +232,7 @@ export default class Sun extends StaticObject {
   private scaleUpSun = () => {
     let tl = gsap.timeline({ onUpdate: this.updateSunScale })
     tl.to(this, {
-      "sunScale": 9.,
+      "sunScale": 8.,
       duration: this.world.transitionDurations.sunExplosion,
       ease: "sine.inOut"
     }, 0)

@@ -17,7 +17,7 @@ export default class Tree extends Actor {
     planetCenter: THREE.Vector3,
     name: string,
     resource: GLTF,
-    autoAddToScene: boolean = true,
+    autoAddToScene: boolean = false,
     makeUnique: boolean = false,
     collisionResource?: GLTF
   ) {

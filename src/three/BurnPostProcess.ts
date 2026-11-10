@@ -12,17 +12,19 @@ export default class BurnPostProcess implements LifeTimeObject{
   declare debug?: Debug | undefined;
   declare debugFolder?: ParametersGroup | undefined;
   declare world: ExpWorld
+  declare whiteScreen: HTMLDivElement
 
   /**
    * Variables
    */
   public burnIntensity = uniform(.1);
-  public effectIntensity = uniform(1.);
+  public effectIntensity = uniform(.1);
 
   constructor(experience: Experience) {
     this.experience = experience;
     this.debug = this.experience.debug
     this.world = this.experience.world as ExpWorld
+    this.whiteScreen = document.querySelector("#whiteScreen") as HTMLDivElement;
   }
 
   init(): void {
@@ -51,14 +53,24 @@ export default class BurnPostProcess implements LifeTimeObject{
 
   triggerSunExplosion(debug: boolean = false) {
     const delay = debug ? 0 : this.world.transitionDurations.sunScaling + this.world.transitionDurations.sunScalingDown + this.world.transitionDurations.sunExplosion * .6
-    gsap.to(this.burnProgress, {
+    const tl = gsap.timeline({delay: delay});
+    tl.to(this.burnProgress, {
       "value": 1.,
       duration: this.world.transitionDurations.sunExplosion * .2,
-      delay: delay,
-      onComplete: () => console.log("coucou"),
-      onStart: () => console.log("start"),
       ease: "power2.out"
-    })
+    }, 0)
+    .to(this.effectIntensity, {
+      "value": 1.,
+      duration: this.world.transitionDurations.sunExplosion * .2,
+      ease: "power2.out"
+    }, 0)
+    .to(this.whiteScreen, {
+      opacity: "1"
+    }, ">")
+    .to(this.whiteScreen, {
+      backgroundColor: "black",
+      duration: 3.
+    }, ">" + 1.5)
   }
 
   update(): void {

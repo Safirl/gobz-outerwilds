@@ -25,6 +25,7 @@ export default class ExpWorld extends World {
   public isAwake = false;
   declare private bloomPostProcess: BloomPostProcess
   declare private burnPostProcess: BurnPostProcess
+  declare private galaxyScene: THREE.Group
 
   declare debug: Debug
   declare debugFolder: ParametersGroup
@@ -32,9 +33,9 @@ export default class ExpWorld extends World {
   declare private transition: WakeUpTransition
 
   public transitionDurations = {
-    sunScaling: 3,//15,
-    sunScalingDown: 3.,//7.
-    sunExplosion: 10.//7.
+    sunScaling: 15,//15,
+    sunScalingDown: 7.,//7.
+    sunExplosion: 15.//7.
   }
 
   init() {
@@ -59,15 +60,25 @@ export default class ExpWorld extends World {
     this.burnPostProcess.init();
     // const ambientLight = new THREE.AmbientLight()
     // this.scene.add(ambientLight)
+    this.galaxyScene = new THREE.Group()
     this.firecamp = new Campfire();
     this.firecamp.init()
+    this.firecamp.addToGroup(this.galaxyScene)
+
     this.moon = new Moon();
     // this.moon.init()
+    this.moon.addToGroup(this.galaxyScene)
     this.earth = new Earth();
+    this.earth.addToGroup(this.galaxyScene)
     this.sun = new Sun();
-    // this.createStick()
+    this.sun.addToGroup(this.galaxyScene)
 
-    this.scene.add(this.sun.mesh)
+    this.stick = new Stick()
+    this.stick.addToGroup(this.galaxyScene)
+
+
+    // this.scene.add(this.sun.mesh)
+    this.scene.add(this.galaxyScene)
 
     this.transition = new WakeUpTransition()
     this.transition.on("onAwake", () => this.switchIsAwake)
@@ -87,10 +98,6 @@ export default class ExpWorld extends World {
 
   switchIsAwake = () => {
     this.isAwake = !this.isAwake
-  }
-
-  createStick = () => {
-    this.stick = new Stick()
   }
 
   update() {

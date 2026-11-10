@@ -12,10 +12,11 @@ export default class Campfire implements LifeTimeObject{
   declare fireMaterial: THREE.MeshStandardNodeMaterial
   declare smokeMaterial: THREE.MeshStandardNodeMaterial
   declare private experience: Experience
-  declare private debug: Debug
-  declare private debugFolder: ParametersGroup
+  declare debug: Debug
+  declare debugFolder: ParametersGroup
   declare private campfire: Actor
   declare private light: THREE.PointLight
+  declare private smokeInstancedSprite: THREE.Mesh
 
   /**
    * Uniforms fire
@@ -47,13 +48,17 @@ export default class Campfire implements LifeTimeObject{
     this.mesh.renderOrder = 10
     this.mesh.position.y = .25
     this.mesh.position.x = -.13
-    this.experience.scene.add(this.mesh)
+    // this.experience.scene.add(this.mesh)
     this.createSmoke()
     this.createPointLight()
 
     if (this.experience.debug.active) {
       this.setDebugObject()
     }
+  }
+
+  addToGroup(group: THREE.Group) {
+    group.add(this.mesh, this.smokeInstancedSprite, this.light)
   }
 
   createSmoke = () => {
@@ -84,12 +89,12 @@ export default class Campfire implements LifeTimeObject{
     smokeNodeMaterial.scaleNode = scaleRange.mul(lifeTime.max(0.3));
     smokeNodeMaterial.depthWrite = false;
 
-    const smokeInstancedSprite = new THREE.Mesh( new THREE.PlaneGeometry( 1., 1 ), smokeNodeMaterial );
-		smokeInstancedSprite.scale.setScalar( 5 );
-    smokeInstancedSprite.count = 200;
-    smokeInstancedSprite.position.y = .3
-		smokeInstancedSprite.renderOrder = 11
-		this.experience.scene.add( smokeInstancedSprite );
+    this.smokeInstancedSprite = new THREE.Mesh( new THREE.PlaneGeometry( 1., 1 ), smokeNodeMaterial );
+		this.smokeInstancedSprite.scale.setScalar( 5 );
+    this.smokeInstancedSprite.count = 200;
+    this.smokeInstancedSprite.position.y = .3
+		this.smokeInstancedSprite.renderOrder = 11
+		// this.experience.scene.add( this.smokeInstancedSprite );
   }
 
   createPointLight = () => {
@@ -102,7 +107,7 @@ export default class Campfire implements LifeTimeObject{
     this.light.position.y = 1.
     this.light.position.x = .5
     this.light.position.z = .5
-    this.experience.scene.add(this.light);
+    // this.experience.scene.add(this.light);
   }
 
   createGeometry = () => {
