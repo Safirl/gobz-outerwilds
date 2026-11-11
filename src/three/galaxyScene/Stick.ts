@@ -1,6 +1,6 @@
 import { Actor, Camera, convertStandardMaterial, Experience } from "@plugins/three-base-experience"
 import type { GLTF } from "three/examples/jsm/Addons.js";
-import type ExperienceCamera from "./Camera";
+import type ExperienceCamera from "../Camera";
 import * as THREE from "three/webgpu"
 import gsap from "gsap";
 import { color, float, mix, smoothstep, uniform } from "three/tsl";
@@ -23,8 +23,12 @@ export default class Stick extends Actor {
 
   constructor() {
     if (!Experience.instance) return;
-    super("🥢 stick", Experience.instance.resources.items.marshmallowModel as GLTF, true, false)
+    super("🥢 stick", Experience.instance.resources.items.marshmallowModel as GLTF, false, false)
     this.init()
+  }
+
+  addToGroup(group: THREE.Group) {
+    group.add(this.model)
   }
 
   init = () => {

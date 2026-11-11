@@ -68,7 +68,7 @@ export default class BurnPostProcess implements LifeTimeObject{
       opacity: "1"
     }, ">")
     .to(this.whiteScreen, {
-      backgroundColor: "black",
+      backgroundColor: "#0D0E18",
       duration: 3.
     }, ">" + 1.5)
   }

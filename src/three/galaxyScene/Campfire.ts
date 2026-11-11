@@ -58,7 +58,7 @@ export default class Campfire implements LifeTimeObject{
   }
 
   addToGroup(group: THREE.Group) {
-    group.add(this.mesh, this.smokeInstancedSprite, this.light)
+    group.add(this.mesh, this.smokeInstancedSprite, this.light, this.campfire.model)
   }
 
   createSmoke = () => {
@@ -155,7 +155,7 @@ export default class Campfire implements LifeTimeObject{
     this.campfire = new Actor(
       "campfire",
       this.experience.resources.items.campfireModel as GLTF,
-      true,
+      false,
       false,
     );
     this.campfire.model.traverse((child) => {

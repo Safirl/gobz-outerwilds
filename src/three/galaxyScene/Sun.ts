@@ -4,7 +4,7 @@ import { smoothstep } from "three/src/nodes/TSL.js";
 import { float, Fn, mix, mrt, mx_fractal_noise_float, mx_noise_float, positionLocal, remap, sin, time, uniform } from "three/tsl";
 import * as THREE from "three/webgpu"
 import gsap from "gsap";
-import type ExpWorld from "./World";
+import type ExpWorld from "../World";
 
 
 export default class Sun extends StaticObject {
@@ -111,6 +111,10 @@ export default class Sun extends StaticObject {
   }
   setMesh(): void {
     super.setMesh()
+  }
+
+  addToGroup(group: THREE.Group) {
+    group.add(this.mesh)
   }
 
   createExplosionMesh() {

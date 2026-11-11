@@ -1,11 +1,11 @@
 import {Experience, World, Environment, OrbitCamera, GPURenderer, Debug} from "@plugins/three-base-experience";
 import * as THREE from "three/webgpu";
-import Campfire from "./Campfire";
-import Moon from "./Moon";
-import Sun from "./Sun";
+import Campfire from "./galaxyScene/Campfire";
+import Moon from "./galaxyScene/Moon";
+import Sun from "./galaxyScene/Sun";
 import Compass from "@plugins/three-base-experience/utils/Compass";
-import Earth from "./Earth";
-import Stick from "./Stick";
+import Earth from "./galaxyScene/Earth";
+import Stick from "./galaxyScene/Stick";
 import WakeUpTransition from "./WakeUpTransition";
 import BloomPostProcess from "./BloomPostProcess";
 import type { ParametersGroup } from "three/examples/jsm/inspector/tabs/Parameters.js";
@@ -26,6 +26,7 @@ export default class ExpWorld extends World {
   declare private bloomPostProcess: BloomPostProcess
   declare private burnPostProcess: BurnPostProcess
   declare private galaxyScene: THREE.Group
+  declare private loopBackScene: THREE.Group
 
   declare debug: Debug
   declare debugFolder: ParametersGroup
@@ -76,9 +77,7 @@ export default class ExpWorld extends World {
     this.stick = new Stick()
     this.stick.addToGroup(this.galaxyScene)
 
-
-    // this.scene.add(this.sun.mesh)
-    this.scene.add(this.galaxyScene)
+    // this.scene.add(this.galaxyScene)
 
     this.transition = new WakeUpTransition()
     this.transition.on("onAwake", () => this.switchIsAwake)
@@ -94,6 +93,9 @@ export default class ExpWorld extends World {
     this.sun.triggerSunExplosion();
     this.environment.triggerSunExplosion();
     this.burnPostProcess.triggerSunExplosion()
+    setTimeout(() => {
+      this.galaxyScene.visible = false;
+    }, 1000*(this.transitionDurations.sunExplosion + this.transitionDurations.sunScaling + this.transitionDurations.sunScalingDown))
   }
 
   switchIsAwake = () => {
